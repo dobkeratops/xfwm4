@@ -42,6 +42,10 @@ Client                  *clientGetNextTopMost                   (ScreenInfo *,
 Client                  *clientGetBottomMost                    (ScreenInfo *,
                                                                  guint,
                                                                  Client *);
+Client                  *clientGetTopMost                    (ScreenInfo *,
+                                                                 guint,
+                                                                 Client *);
+																 
 Client                  *clientAtPosition                       (ScreenInfo *,
                                                                  int,
                                                                  int,
@@ -60,5 +64,6 @@ Client                  *clientGetLastRaise                     (ScreenInfo *);
 void                     clientClearLastRaise                   (ScreenInfo *);
 void                     clientClearDelayedRaise                (void);
 void                     clientResetDelayedRaise                (ScreenInfo *);
+void					clientWarpToTitle							(Client* c);
 
 #endif /* INC_STACKING_H */

@@ -1,5 +1,7 @@
 /*      $Id$
 
+
+
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
         the Free Software Foundation; either version 2, or (at your option)
@@ -243,6 +245,38 @@ clientGetBottomMost (ScreenInfo *screen_info, guint layer, Client * exclude)
         }
     }
     return bot;
+}
+
+Client*
+clientGetTopMost(ScreenInfo* screen_info, guint layer, Client* exclude){
+    Client *top=NULL, *c;
+    GList *list;
+
+    TRACE ("entering clientGetTopMost");
+
+	printf("WindowList:\n");
+    for (list = screen_info->windows_stack; list; list = g_list_next (list))
+    {
+        c = (Client *) list->data;
+        if (c)
+        {
+            TRACE ("*** stack window \"%s\" (0x%lx), layer %i", c->name,
+                c->window, (int) c->win_layer);
+            if (!exclude || (c != exclude))
+            {
+				printf("%s (%d %d) layer=%d\n", c->name,c->x,c->y, c->win_layer);
+                if (c->win_layer <= layer)
+                {
+                    top=c;
+                }
+                else if (c->win_layer > layer)
+                {
+                    break;
+                }
+            }
+        }
+    }
+    return top;
 }
 
 /*
@@ -527,6 +561,13 @@ clientLower (Client * c, Window wsibling)
             screen_info->last_raise = NULL;
         }
     }
+}
+
+void
+clientWarpToTitle(Client* c) {
+	ScreenInfo* screen_info=c->screen_info;
+	Client* new_top = clientGetTopMost(screen_info, c->win_layer, NULL);
+	XWarpPointer(screen_info->display_info->dpy, None, c->window, 0,0,0,0,  c->width/2, -8);
 }
 
 gboolean

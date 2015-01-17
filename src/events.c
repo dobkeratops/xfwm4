@@ -293,6 +293,14 @@ handleMotionNotify (DisplayInfo *display_info, XMotionEvent * ev)
     return EVENT_FILTER_REMOVE;
 }
 
+void takeWindow(ScreenInfo* screen_info, Client* c, int workspace_delta, XKeyEvent* ev,eventFilterStatus *status) {
+	clientRaise (c, None);
+	int to_ws=screen_info->current_ws + workspace_delta;
+	workspaceSwitch (screen_info, to_ws, c, TRUE, ev->time);
+	if (status) {*status = EVENT_FILTER_REMOVE;}
+	workspaceSwitch (screen_info, to_ws, NULL, TRUE, ev->time);
+}
+
 static eventFilterStatus
 handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
 {
@@ -386,7 +394,14 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
             case KEY_MOVE_PREV_WORKSPACE:
                 workspaceSwitch (screen_info, screen_info->current_ws - 1, c, TRUE, ev->time);
                 break;
-            case KEY_MOVE_UP_WORKSPACE:
+            case KEY_TAKE_WIN_PREV_WORKSPACE:
+				takeWindow(screen_info, -1, c, ev,&status);
+                break;
+            case KEY_TAKE_WIN_NEXT_WORKSPACE:
+				takeWindow(screen_info, 1, c, ev,&status);
+                break;
+
+			case KEY_MOVE_UP_WORKSPACE:
                 workspaceMove (screen_info, -1, 0, c, ev->time);
                 break;
             case KEY_MOVE_DOWN_WORKSPACE:
@@ -808,13 +823,15 @@ titleButton (Client * c, guint state, XButtonEvent * ev)
         }
         else
 #endif /* HAVE_COMPOSITOR */
-        if (!FLAG_TEST (c->flags, CLIENT_FLAG_SHADED))
-        {
-            if (screen_info->params->mousewheel_rollup)
-            {
-                clientShade (c);
-            }
-        }
+		// TODO - change mousewheel to selectable action (rollup, take-to-desktop,...)
+		if (screen_info->params->mousewheel_rollup && 0) {
+	        if (!FLAG_TEST (c->flags, CLIENT_FLAG_SHADED))
+	        {
+	            clientShade (c);
+		    }
+		} else {
+			takeWindow(screen_info, c, 1, ev,NULL);
+		}
     }
     else if (ev->button == Button5)
     {
@@ -826,13 +843,14 @@ titleButton (Client * c, guint state, XButtonEvent * ev)
         }
         else
 #endif /* HAVE_COMPOSITOR */
-        if (FLAG_TEST (c->flags, CLIENT_FLAG_SHADED))
-        {
-            if (screen_info->params->mousewheel_rollup)
-            {
-                clientUnshade (c);
+        if (screen_info->params->mousewheel_rollup && 0){
+	        if (FLAG_TEST (c->flags, CLIENT_FLAG_SHADED))
+	        {
+	            clientUnshade (c);
             }
-        }
+        } else {
+			takeWindow(screen_info, c, -1, ev,NULL);
+		}
     }
     else if (ev->button == Button6)
     {

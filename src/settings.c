@@ -197,11 +197,11 @@ static void
 loadRcData (ScreenInfo *screen_info, Settings *rc)
 {
     gchar *homedir;
-
+	printf("hello from my xfwm\n");
     if (!parseRc ("defaults", PACKAGE_DATADIR, rc))
     {
         g_warning ("Missing defaults file");
-        exit (1);
+//        exit (1);
     }
     homedir = xfce_resource_save_location (XFCE_RESOURCE_CONFIG,
                                            "xfce4" G_DIR_SEPARATOR_S "xfwm4",
@@ -649,6 +649,8 @@ loadKeyBindings (ScreenInfo *screen_info)
     parseShortcut (screen_info, KEY_TOGGLE_ABOVE, "above_key", shortcuts);
     parseShortcut (screen_info, KEY_TOGGLE_FULLSCREEN, "fullscreen_key", shortcuts);
     parseShortcut (screen_info, KEY_UP_WORKSPACE, "up_workspace_key", shortcuts);
+    parseShortcut (screen_info, KEY_TAKE_WIN_NEXT_WORKSPACE, "take_window_next_workspace_key", shortcuts);
+    parseShortcut (screen_info, KEY_TAKE_WIN_PREV_WORKSPACE, "take_window_prev_workspace_key", shortcuts);
 
     for (i = 0; i < 12; i++)
     {
